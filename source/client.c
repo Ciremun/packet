@@ -12,7 +12,7 @@ int main(int argc, char **argv)
     }
 #endif
     int sockfd = 0, n = 0;
-    char recvBuff[1025];
+    char recvBuff[512];
     struct sockaddr_in serv_addr;
 
     if (argc != 2)
@@ -45,18 +45,24 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    while ((n = recv(sockfd, recvBuff, sizeof(recvBuff)-1, MSG_WAITALL)) > 0)
-    {
-        recvBuff[n] = 0;
-        if(fputs(recvBuff, stdout) == EOF)
-        {
-            printf("\n Error : Fputs error\n");
-        }
-    }
+    srand(time(NULL));
+    int sn = rand();
+    send(sockfd, (const char *)&sn, 4, 0);
 
-    if (n < 0)
-    {
-        printf("\n Read error \n");
-    }
+    close(sockfd);
+
+    // while ((n = recv(sockfd, recvBuff, sizeof(recvBuff)-1, MSG_WAITALL)) > 0)
+    // {
+    //     recvBuff[n] = 0;
+    //     if(fputs(recvBuff, stdout) == EOF)
+    //     {
+    //         printf("\n Error : Fputs error\n");
+    //     }
+    // }
+
+    // if (n < 0)
+    // {
+    //     printf("\n Read error \n");
+    // }
     return 0;
 }

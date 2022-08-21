@@ -14,7 +14,7 @@ int main(void)
     int listenfd = 0, connfd = 0;
     struct sockaddr_in serv_addr;
 
-    char sendBuff[1025];
+    char sendBuff[512];
     time_t ticks;
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
@@ -29,13 +29,39 @@ int main(void)
 
     listen(listenfd, 10);
 
+    char recvBuff[512];
+    int n = 0;
+
+    int ring_data[4];
+    Ring ring = ring_init(ring_data, 4);
+
     while (1)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
         ticks = time(NULL);
-        snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
-        printf("sendBuff: %s\n", sendBuff);
-        send(connfd, sendBuff, strlen(sendBuff), 0);
+
+        while ((n = recv(connfd, recvBuff, sizeof(recvBuff)-1, MSG_WAITALL)) > 0)
+        {
+            printf("receiving data!\n");
+            recvBuff[n] = 0;
+            // if(fputs(recvBuff, stdout) == EOF)
+            // {
+            //     printf("\n Error : Fputs error\n");
+            // }
+            int sn = *(int *)recvBuff;
+            ring_write(&ring, (void *)(uintptr_t)sn);
+            printf("Ring buffer: [%d, %d, %d, %d]\n", (int *)ring.data[0], (int *)ring.data[1], (int *)ring.data[2], (int *)ring.data[3]);
+        }
+
+        if (n < 0)
+        {
+            printf("n: %d\n", n);
+            printf("Read error: %ld\n", WSAGetLastError());
+        }
+
+        // snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
+        // printf("sendBuff: %s\n", sendBuff);
+        // send(connfd, sendBuff, strlen(sendBuff), 0);
         close(connfd);
         sleep_seconds(1);
     }

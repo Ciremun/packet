@@ -3,5 +3,6 @@
 
 #include "socket.h"
 #include "os.h"
+#include "ring.h"
 
 #endif // _SERVER_H_

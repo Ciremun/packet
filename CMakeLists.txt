@@ -7,6 +7,6 @@ add_executable(client source/client.c)
 target_link_libraries(client Ws2_32)
 target_include_directories(client PRIVATE include)
 
-add_executable(server source/server.c source/os.c)
+add_executable(server source/server.c source/os.c source/ring.c)
 target_link_libraries(server Ws2_32)
 target_include_directories(server PRIVATE include)
