@@ -1,5 +1,7 @@
 CMakeFiles/
 CMakeCache.txt
+client
+server
 .ninja_deps
 .ninja_log
 *.ninja
