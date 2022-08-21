@@ -2,4 +2,4 @@
 
 ## Build
 
-cmake . && ninja
+    cmake . && ninja
