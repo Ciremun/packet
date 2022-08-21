@@ -1,0 +1,5 @@
+# Packets
+
+## Build
+
+cmake . && ninja
