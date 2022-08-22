@@ -9,6 +9,8 @@ add_executable(server source/server.c source/sleep.c source/ring.c source/error.
 if (WIN32)
     target_link_libraries(client Ws2_32)
     target_link_libraries(server Ws2_32)
+else()
+    target_link_libraries(server pthread)
 endif()
 
 target_include_directories(client PRIVATE include)
