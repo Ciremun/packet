@@ -43,7 +43,7 @@ int main(void)
         while ((n = recv(connfd, (char *)&received_packet, sizeof(Packet), MSG_WAITALL)) > 0)
         {
             printf("receiving data: %d bytes\n", n);
-            printf("packet: %zu, %zu, %d\n", received_packet.id, received_packet.date, received_packet.state);
+            printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
             int16_t *packet_data = (int16_t *)malloc(1024 * sizeof(int16_t));
             memcpy(packet_data, received_packet.data, 1024 * sizeof(int16_t));
             ring_write(&ring, packet_data);

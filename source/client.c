@@ -47,14 +47,13 @@ int main(int argc, char **argv)
 
     Packet packet;
     packet.id = 1;
+    packet.state = PKT_CREATED;
 
     struct timespec date;
     clock_gettime(CLOCK_MONOTONIC_RAW, &date);
-    packet.date = date.tv_nsec;
+    packet.date = date;
 
-    printf("packet.date: %ld\n", packet.date);
-
-    packet.state = PKT_CREATED;
+    printf("ctime: %s\n", ctime(&date.tv_sec));
 
     srand(time(NULL));
     for (int16_t i = 0; i < 1024; ++i)

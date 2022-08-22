@@ -1,4 +1,7 @@
 #include <stddef.h>
+#include <time.h>
+
+#include "clock.h"
 
 typedef enum
 {
@@ -10,7 +13,7 @@ typedef enum
 typedef struct
 {
     size_t id;
-    long date;
+    struct timespec date;
     PacketState state;
     int data[1024];
 } Packet;
