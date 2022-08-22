@@ -4,5 +4,6 @@
 #include "socket.h"
 #include "os.h"
 #include "ring.h"
+#include "error.h"
 
 #endif // _SERVER_H_

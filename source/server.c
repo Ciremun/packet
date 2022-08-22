@@ -7,7 +7,7 @@ int main(void)
     int wsa = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (wsa != 0)
     {
-        printf("WSAStartup failed with error: %d", wsa);
+        fprintf(stderr, "WSAStartup failed with error: %d", wsa);
         return 1;
     }
 #endif
@@ -44,10 +44,6 @@ int main(void)
         {
             printf("receiving data!\n");
             recvBuff[n] = 0;
-            // if(fputs(recvBuff, stdout) == EOF)
-            // {
-            //     printf("\n Error : Fputs error\n");
-            // }
             int sn = *(int *)recvBuff;
             ring_write(&ring, (void *)(uintptr_t)sn);
             printf("Ring buffer: [%d, %d, %d, %d]\n", (int *)ring.data[0], (int *)ring.data[1], (int *)ring.data[2], (int *)ring.data[3]);
@@ -55,13 +51,9 @@ int main(void)
 
         if (n < 0)
         {
-            printf("n: %d\n", n);
-            printf("Read error: %ld\n", WSAGetLastError());
+            SOCK_ERROR(PKT_RECV_ERROR);
         }
 
-        // snprintf(sendBuff, sizeof(sendBuff), "%.24s\r\n", ctime(&ticks));
-        // printf("sendBuff: %s\n", sendBuff);
-        // send(connfd, sendBuff, strlen(sendBuff), 0);
         close(connfd);
         sleep_seconds(1);
     }
