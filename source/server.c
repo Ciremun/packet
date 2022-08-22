@@ -29,24 +29,24 @@ int main(void)
 
     listen(listenfd, 10);
 
-    char recvBuff[512];
+    Packet received_packet;
     int n = 0;
 
-    int ring_data[4];
-    Ring ring = ring_init(ring_data, 4);
+    int packets[16] = {0};
+    Ring ring = ring_init(packets, 16);
 
     while (1)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
         ticks = time(NULL);
 
-        while ((n = recv(connfd, recvBuff, sizeof(recvBuff)-1, MSG_WAITALL)) > 0)
+        while ((n = recv(connfd, (char *)&received_packet, sizeof(Packet), MSG_WAITALL)) > 0)
         {
-            printf("receiving data!\n");
-            recvBuff[n] = 0;
-            int sn = *(int *)recvBuff;
-            ring_write(&ring, (void *)(uintptr_t)sn);
-            printf("Ring buffer: [%d, %d, %d, %d]\n", (int *)ring.data[0], (int *)ring.data[1], (int *)ring.data[2], (int *)ring.data[3]);
+            printf("receiving data: %d bytes\n", n);
+            printf("packet: %zu, %zu, %d\n", received_packet.id, received_packet.date, received_packet.state);
+            int16_t *packet_data = (int16_t *)malloc(1024 * sizeof(int16_t));
+            memcpy(packet_data, received_packet.data, 1024 * sizeof(int16_t));
+            ring_write(&ring, packet_data);
         }
 
         if (n < 0)
@@ -55,7 +55,7 @@ int main(void)
         }
 
         close(connfd);
-        sleep_seconds(1);
+        // sleep_ms(1);
     }
     return 0;
 }

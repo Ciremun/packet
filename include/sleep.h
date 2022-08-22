@@ -7,6 +7,6 @@
 #include <unistd.h>
 #endif // _WIN32
 
-void sleep_seconds(unsigned int seconds);
+void sleep_ms(unsigned int ms);
 
 #endif // _OS_H_

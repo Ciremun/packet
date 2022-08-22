@@ -45,11 +45,23 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    Packet packet;
+    packet.id = 1;
+
+    struct timespec date;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &date);
+    packet.date = date.tv_nsec;
+
+    printf("packet.date: %ld\n", packet.date);
+
+    packet.state = PKT_CREATED;
+
     srand(time(NULL));
-    int sn = rand();
-    send(sockfd, (const char *)&sn, 4, 0);
+    for (int16_t i = 0; i < 1024; ++i)
+        packet.data[i] = rand();
+
+    send(sockfd, (const char *)&packet, sizeof(Packet), 0);
 
     close(sockfd);
-
     return 0;
 }
