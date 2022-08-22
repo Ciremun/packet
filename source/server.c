@@ -44,9 +44,9 @@ int main(void)
         {
             printf("receiving data: %d bytes\n", n);
             printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
-            int16_t *packet_data = (int16_t *)malloc(1024 * sizeof(int16_t));
-            memcpy(packet_data, received_packet.data, 1024 * sizeof(int16_t));
-            ring_write(&ring, packet_data);
+            Packet *packet = (Packet *)malloc(sizeof(Packet));
+            memcpy(packet, &received_packet, sizeof(Packet));
+            ring_write(&ring, packet);
         }
 
         if (n < 0)
