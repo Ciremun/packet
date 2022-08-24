@@ -30,7 +30,7 @@ int main(void)
     listen(listenfd, 10);
 
     Packet received_packet;
-    int n = 0;
+    int bytes_read = 0;
 
     int packets[16] = {0};
     Ring ring = ring_init(packets, 16);
@@ -40,16 +40,16 @@ int main(void)
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
         ticks = time(NULL);
 
-        while ((n = recv(connfd, (char *)&received_packet, sizeof(Packet), MSG_WAITALL)) > 0)
+        while ((bytes_read = recv(connfd, (char *)&received_packet, sizeof(Packet), MSG_WAITALL)) > 0)
         {
-            printf("receiving data: %d bytes\n", n);
+            printf("receiving data: %d bytes\n", bytes_read);
             printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
             Packet *packet = (Packet *)malloc(sizeof(Packet));
             memcpy(packet, &received_packet, sizeof(Packet));
             ring_write(&ring, packet);
         }
 
-        if (n < 0)
+        if (bytes_read < 0)
         {
             SOCK_ERROR(PKT_RECV_ERROR);
         }
