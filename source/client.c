@@ -26,7 +26,7 @@ int main(int argc, char **argv)
     packet->state = PKT_CREATED;
 
     struct timespec date;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &date);
+    clock_gettime(CLOCK_REALTIME, &date);
     packet->date = date;
 
     printf("ctime: %s\n", ctime(&date.tv_sec));
