@@ -32,6 +32,7 @@ int main(int argc, char **argv)
 
     srand(time(NULL));
     packet.array.size = 550;
+    packet.array.data = (int16_t *)malloc(packet.array.size * sizeof(int16_t));
     for (int16_t i = 0; i < packet.array.size; ++i)
         packet.array.data[i] = rand();
 
@@ -67,6 +68,8 @@ int main(int argc, char **argv)
         SOCK_ERROR(PKT_SEND_ERROR);
     }
     printf("bytes_sent: %d\n", bytes_sent);
+
+    free(packet.array.data);
 
     close(sockfd);
     return 0;
