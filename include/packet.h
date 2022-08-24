@@ -7,7 +7,7 @@
 
 #include "clock.h"
 
-#define PKT_SIZE(packet) (offsetof(Packet, array) + sizeof(size_t) + packet.array.size * sizeof(int16_t))
+#define PKT_SIZE(array_size) (offsetof(Packet, array) + sizeof(size_t) + array_size * sizeof(int16_t))
 
 typedef enum
 {

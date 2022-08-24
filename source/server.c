@@ -24,7 +24,7 @@ int main(void)
     bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
     listen(listenfd, 10);
 
-    Packet received_packet;
+    Packet packet_info;
     int bytes_read = 0;
     uintptr_t packets[16] = {0};
     Ring ring = ring_init(packets, 16);
@@ -37,20 +37,19 @@ int main(void)
     while (1)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-
-        if ((bytes_read = recv(connfd, (char *)&received_packet, offsetof(Packet, array) + sizeof(size_t), MSG_WAITALL)) > 0)
+        static const size_t packet_info_size = offsetof(Packet, array) + sizeof(size_t);
+        if ((bytes_read = recv(connfd, (char *)&packet_info, packet_info_size, MSG_WAITALL)) > 0)
         {
             printf("receiving data: %d bytes\n", bytes_read);
-            printf("waiting for %d bytes\n", received_packet.array.size * sizeof(int16_t));
-            if ((bytes_read = recv(connfd, (char *)&received_packet.array.data, received_packet.array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
+            Packet *packet = (Packet *)malloc(PKT_SIZE(packet_info.array.size));
+            memcpy(packet, &packet_info, packet_info_size);
+            if ((bytes_read = recv(connfd, (char *)&packet->array.data, packet->array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
             {
                 printf("receiving data: %d bytes\n", bytes_read);
-                printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
-                // Packet *packet = (Packet *)malloc(sizeof(Packet));
-                // memcpy(packet, &received_packet, sizeof(Packet));
-                // lock_mutex(packet_proc.mutex);
-                // ring_write(&ring, packet);
-                // unlock_mutex(packet_proc.mutex);
+                printf("packet: %zu, %s.%ld, %d\n", packet->id, strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec, packet->state);
+                lock_mutex(packet_proc.mutex);
+                ring_write(&ring, packet);
+                unlock_mutex(packet_proc.mutex);
             }
             else if (bytes_read < 0)
             {
@@ -64,7 +63,6 @@ int main(void)
             goto error;
         }
 error:
-        printf("bytes read: %d\n", bytes_read);
         close(connfd);
         sleep_ms(10);
     }

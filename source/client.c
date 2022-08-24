@@ -20,23 +20,23 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    Packet packet;
-    packet.id = 1;
-    packet.state = PKT_CREATED;
+    size_t packet_array_size = 550;
+    Packet *packet = (Packet *)malloc(PKT_SIZE(packet_array_size));
+    packet->id = 1;
+    packet->state = PKT_CREATED;
 
     struct timespec date;
     clock_gettime(CLOCK_MONOTONIC_RAW, &date);
-    packet.date = date;
+    packet->date = date;
 
     printf("ctime: %s\n", ctime(&date.tv_sec));
 
     srand(time(NULL));
-    packet.array.size = 550;
-    packet.array.data = (int16_t *)malloc(packet.array.size * sizeof(int16_t));
-    for (int16_t i = 0; i < packet.array.size; ++i)
-        packet.array.data[i] = rand();
+    packet->array.size = packet_array_size;
+    for (int16_t i = 0; i < packet->array.size; ++i)
+        packet->array.data[i] = rand();
 
-    int packet_size = PKT_SIZE(packet);
+    int packet_size = PKT_SIZE(packet->array.size);
     printf("packet_size: %d\n", packet_size);
 
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
@@ -62,14 +62,12 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    int bytes_sent = send(sockfd, (const char *)&packet, packet_size, 0);
+    int bytes_sent = send(sockfd, (const char *)packet, packet_size, 0);
     if (bytes_sent < 0)
     {
         SOCK_ERROR(PKT_SEND_ERROR);
     }
     printf("bytes_sent: %d\n", bytes_sent);
-
-    free(packet.array.data);
 
     close(sockfd);
     return 0;
