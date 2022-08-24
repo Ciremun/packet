@@ -41,6 +41,11 @@ int main(void)
         if ((bytes_read = recv(connfd, (char *)&packet_info, packet_info_size, MSG_WAITALL)) > 0)
         {
             printf("receiving data: %d bytes\n", bytes_read);
+            if (!(600 <= packet_info.array.size && packet_info.array.size <= 1600))
+            {
+                SOCK_ERROR(PKT_SIZE_ERROR);
+                goto error;
+            }
             Packet *packet = (Packet *)malloc(PKT_SIZE(packet_info.array.size));
             memcpy(packet, &packet_info, packet_info_size);
             if ((bytes_read = recv(connfd, (char *)&packet->array.data, packet->array.size * sizeof(int16_t), MSG_WAITALL)) > 0)

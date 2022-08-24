@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    size_t packet_array_size = 550;
+    size_t packet_array_size = 1600;
     Packet *packet = (Packet *)malloc(PKT_SIZE(packet_array_size));
     packet->id = 1;
     packet->state = PKT_CREATED;
