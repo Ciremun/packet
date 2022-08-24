@@ -1,3 +1,6 @@
+#ifndef _PACKET_H_
+#define _PACKET_H_
+
 #include <stddef.h>
 #include <time.h>
 
@@ -17,3 +20,5 @@ typedef struct
     PacketState state;
     int data[1024];
 } Packet;
+
+#endif // _PACKET_H_

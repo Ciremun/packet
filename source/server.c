@@ -28,10 +28,9 @@ int main(void)
 
     listen(listenfd, 10);
 
-
     Packet received_packet;
     int bytes_read = 0;
-    int packets[16] = {0};
+    uintptr_t packets[16] = {0};
     Ring ring = ring_init(packets, 16);
 
     pkt_thread_t packets_thread = create_thread(process_incoming_packets, &ring);
