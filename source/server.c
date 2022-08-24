@@ -15,7 +15,6 @@ int main(void)
     struct sockaddr_in serv_addr;
 
     char sendBuff[512];
-    time_t ticks;
 
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serv_addr, 0, sizeof(serv_addr));
@@ -38,7 +37,6 @@ int main(void)
     while (1)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-        ticks = time(NULL);
 
         while ((bytes_read = recv(connfd, (char *)&received_packet, sizeof(Packet), MSG_WAITALL)) > 0)
         {
