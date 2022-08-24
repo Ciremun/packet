@@ -12,7 +12,6 @@ int main(int argc, char **argv)
     }
 #endif
     int sockfd = 0, n = 0;
-    char recvBuff[512];
     struct sockaddr_in serv_addr;
 
     if (argc != 2)
@@ -21,7 +20,24 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    memset(recvBuff, 0, sizeof(recvBuff));
+    Packet packet;
+    packet.id = 1;
+    packet.state = PKT_CREATED;
+
+    struct timespec date;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &date);
+    packet.date = date;
+
+    printf("ctime: %s\n", ctime(&date.tv_sec));
+
+    srand(time(NULL));
+    packet.array.size = 550;
+    for (int16_t i = 0; i < packet.array.size; ++i)
+        packet.array.data[i] = rand();
+
+    int packet_size = PKT_SIZE(packet);
+    printf("packet_size: %d\n", packet_size);
+
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         SOCK_ERROR(PKT_SOCK_ERROR);
@@ -44,24 +60,6 @@ int main(int argc, char **argv)
         SOCK_ERROR(PKT_CONN_ERROR);
         return 1;
     }
-
-    Packet packet;
-    packet.id = 1;
-    packet.state = PKT_CREATED;
-
-    struct timespec date;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &date);
-    packet.date = date;
-
-    printf("ctime: %s\n", ctime(&date.tv_sec));
-
-    srand(time(NULL));
-    packet.array.size = 128;
-    for (int16_t i = 0; i < packet.array.size; ++i)
-        packet.array.data[i] = rand();
-
-    int packet_size = PKT_SIZE(packet);
-    printf("packet_size: %d\n", packet_size);
 
     int bytes_sent = send(sockfd, (const char *)&packet, packet_size, 0);
     if (bytes_sent < 0)

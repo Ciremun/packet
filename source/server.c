@@ -41,24 +41,30 @@ int main(void)
         if ((bytes_read = recv(connfd, (char *)&received_packet, offsetof(Packet, array) + sizeof(size_t), MSG_WAITALL)) > 0)
         {
             printf("receiving data: %d bytes\n", bytes_read);
+            printf("waiting for %d bytes\n", received_packet.array.size * sizeof(int16_t));
+            if ((bytes_read = recv(connfd, (char *)&received_packet.array.data, received_packet.array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
+            {
+                printf("receiving data: %d bytes\n", bytes_read);
+                printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
+                // Packet *packet = (Packet *)malloc(sizeof(Packet));
+                // memcpy(packet, &received_packet, sizeof(Packet));
+                // lock_mutex(packet_proc.mutex);
+                // ring_write(&ring, packet);
+                // unlock_mutex(packet_proc.mutex);
+            }
+            else if (bytes_read < 0)
+            {
+                SOCK_ERROR(PKT_RECV_ERROR);
+                goto error;
+            }
         }
-
-        while ((bytes_read = recv(connfd, (char *)(&received_packet + offsetof(Packet, array)), received_packet.array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
-        {
-            printf("receiving data: %d bytes\n", bytes_read);
-            printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
-            Packet *packet = (Packet *)malloc(sizeof(Packet));
-            memcpy(packet, &received_packet, sizeof(Packet));
-            lock_mutex(packet_proc.mutex);
-            ring_write(&ring, packet);
-            unlock_mutex(packet_proc.mutex);
-        }
-
-        if (bytes_read < 0)
+        else if (bytes_read < 0)
         {
             SOCK_ERROR(PKT_RECV_ERROR);
+            goto error;
         }
-
+error:
+        printf("bytes read: %d\n", bytes_read);
         close(connfd);
         sleep_ms(10);
     }
