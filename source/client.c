@@ -56,10 +56,19 @@ int main(int argc, char **argv)
     printf("ctime: %s\n", ctime(&date.tv_sec));
 
     srand(time(NULL));
-    for (int16_t i = 0; i < 1024; ++i)
-        packet.data[i] = rand();
+    packet.array.size = 128;
+    for (int16_t i = 0; i < packet.array.size; ++i)
+        packet.array.data[i] = rand();
 
-    send(sockfd, (const char *)&packet, sizeof(Packet), 0);
+    int packet_size = PKT_SIZE(packet);
+    printf("packet_size: %d\n", packet_size);
+
+    int bytes_sent = send(sockfd, (const char *)&packet, packet_size, 0);
+    if (bytes_sent < 0)
+    {
+        SOCK_ERROR(PKT_SEND_ERROR);
+    }
+    printf("bytes_sent: %d\n", bytes_sent);
 
     close(sockfd);
     return 0;

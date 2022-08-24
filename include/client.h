@@ -2,6 +2,7 @@
 #define _CLIENT_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include "socket.h"
 #include "error.h"

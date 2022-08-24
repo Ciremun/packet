@@ -3,8 +3,11 @@
 
 #include <stddef.h>
 #include <time.h>
+#include <stdint.h>
 
 #include "clock.h"
+
+#define PKT_SIZE(packet) (offsetof(Packet, array) + sizeof(size_t) + packet.array.size * sizeof(int16_t))
 
 typedef enum
 {
@@ -15,10 +18,16 @@ typedef enum
 
 typedef struct
 {
+    size_t size;
+    int16_t data[];
+} PacketData;
+
+typedef struct
+{
     size_t id;
     struct timespec date;
     PacketState state;
-    int data[1024];
+    PacketData array;
 } Packet;
 
 #endif // _PACKET_H_

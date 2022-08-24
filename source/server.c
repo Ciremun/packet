@@ -38,7 +38,12 @@ int main(void)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
 
-        while ((bytes_read = recv(connfd, (char *)&received_packet, sizeof(Packet), MSG_WAITALL)) > 0)
+        if ((bytes_read = recv(connfd, (char *)&received_packet, offsetof(Packet, array) + sizeof(size_t), MSG_WAITALL)) > 0)
+        {
+            printf("receiving data: %d bytes\n", bytes_read);
+        }
+
+        while ((bytes_read = recv(connfd, (char *)(&received_packet + offsetof(Packet, array)), received_packet.array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
         {
             printf("receiving data: %d bytes\n", bytes_read);
             printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);

@@ -2,6 +2,7 @@
 #define _SERVER_H_
 
 #include <stdlib.h>
+#include <stddef.h>
 
 #include "socket.h"
 #include "sleep.h"
