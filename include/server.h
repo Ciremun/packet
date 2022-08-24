@@ -8,5 +8,7 @@
 #include "ring.h"
 #include "error.h"
 #include "packet.h"
+#include "thread.h"
+#include "proc.h"
 
 #endif // _SERVER_H_

@@ -4,7 +4,7 @@ project(packets VERSION 0.0.1)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(client source/client.c source/error.c source/clock.c)
-add_executable(server source/server.c source/sleep.c source/ring.c source/error.c source/thread.c)
+add_executable(server source/server.c source/sleep.c source/ring.c source/error.c source/thread.c source/proc.c)
 
 if (WIN32)
     target_link_libraries(client Ws2_32)
