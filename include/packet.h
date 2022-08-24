@@ -27,6 +27,7 @@ typedef struct
     size_t id;
     struct timespec date;
     PacketState state;
+    uint8_t hash[16];
     PacketData array;
 } Packet;
 

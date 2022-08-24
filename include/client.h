@@ -8,5 +8,6 @@
 #include "error.h"
 #include "packet.h"
 #include "clock.h"
+#include "md5.h"
 
 #endif // _CLIENT_H_
