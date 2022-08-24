@@ -1,29 +1,26 @@
 #include "proc.h"
 
-void *process_incoming_packets(void *ring)
+void *process_incoming_packets(void *packet_proc)
 {
-    Ring *packets_ring = (Ring *)ring;
+    PacketProc *pp = (PacketProc *)packet_proc;
+    Ring *packets_ring = pp->ring;
+    pkt_mutex_t packets_mutex = pp->mutex;
     while (1)
     {
+        lock_mutex(packets_mutex);
         for (size_t i = 0; i < packets_ring->size; ++i)
         {
             Packet *packet = (Packet *)packets_ring->data[i];
             if (packet == 0)
-            {
-                printf("empty ring slot!\n");
                 continue;
-            }
             if (packet->state == PKT_CREATED)
             {
                 printf("found packet with created state!\n");
                 packet->state = PKT_PROCESSED;
             }
-            else
-            {
-                printf("found packet with %d state!\n", packet->state);
-            }
         }
-        sleep_ms(3000);
+        unlock_mutex(packets_mutex);
+        sleep_ms(15);
     }
     return 0;
 }

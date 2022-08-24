@@ -10,5 +10,6 @@
 #include "packet.h"
 #include "thread.h"
 #include "proc.h"
+#include "mutex.h"
 
 #endif // _SERVER_H_

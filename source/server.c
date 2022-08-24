@@ -14,18 +14,14 @@ int main(void)
     int listenfd = 0, connfd = 0;
     struct sockaddr_in serv_addr;
 
-    char sendBuff[512];
-
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     memset(&serv_addr, 0, sizeof(serv_addr));
-    memset(sendBuff, 0, sizeof(sendBuff));
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
     serv_addr.sin_port = htons(5000);
 
     bind(listenfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
-
     listen(listenfd, 10);
 
     Packet received_packet;
@@ -33,7 +29,10 @@ int main(void)
     uintptr_t packets[16] = {0};
     Ring ring = ring_init(packets, 16);
 
-    pkt_thread_t packets_thread = create_thread(process_incoming_packets, &ring);
+    PacketProc packet_proc;
+    packet_proc.ring = &ring;
+    packet_proc.mutex = create_mutex();
+    pkt_thread_t packets_thread = create_thread(process_incoming_packets, &packet_proc);
 
     while (1)
     {
@@ -45,7 +44,9 @@ int main(void)
             printf("packet: %zu, %s.%ld, %d\n", received_packet.id, strtok(ctime(&received_packet.date.tv_sec), "\n"), received_packet.date.tv_nsec, received_packet.state);
             Packet *packet = (Packet *)malloc(sizeof(Packet));
             memcpy(packet, &received_packet, sizeof(Packet));
+            lock_mutex(packet_proc.mutex);
             ring_write(&ring, packet);
+            unlock_mutex(packet_proc.mutex);
         }
 
         if (bytes_read < 0)
@@ -54,7 +55,11 @@ int main(void)
         }
 
         close(connfd);
-        // sleep_ms(1);
+        sleep_ms(10);
     }
+
+    join_thread(packets_thread);
+    delete_mutex(packet_proc.mutex);
+
     return 0;
 }
