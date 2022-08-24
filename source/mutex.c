@@ -6,7 +6,7 @@ pkt_mutex_t create_mutex()
     return CreateMutex(0, 0, 0);
 #else
 	pthread_mutexattr_t mta;
-	og_mutex_t r = malloc(sizeof(pthread_mutex_t));
+	pkt_mutex_t r = malloc(sizeof(pthread_mutex_t));
 	if (!r)
         return 0;
 	pthread_mutexattr_init(&mta);
