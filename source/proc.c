@@ -1,19 +1,11 @@
 #include "proc.h"
 
-int verify_packet_md5(PacketData array, uint8_t *hash)
+int verify_packet_md5(PacketData *array, uint8_t *hash)
 {
     MD5Context ctx;
 	md5Init(&ctx);
-	md5Update(&ctx, (uint8_t *)array.data, array.size);
+	md5Update(&ctx, (uint8_t *)array->data, array->size);
 	md5Finalize(&ctx);
-    for(unsigned int i = 0; i < 16; ++i){
-		printf("%02x", ctx.digest[i]);
-	}
-	printf("\n");
-    for(unsigned int i = 0; i < 16; ++i){
-		printf("%02x", hash[i]);
-	}
-	printf("\n");
     return memcmp(ctx.digest, hash, 16) == 0;
 }
 
@@ -32,8 +24,7 @@ void *process_incoming_packets(void *packet_proc)
                 continue;
             if (packet->state == PKT_CREATED)
             {
-                printf("found packet with created state!\n");
-                if (verify_packet_md5(packet->array, packet->hash))
+                if (verify_packet_md5(&packet->array, packet->hash))
                     printf("md5 verification PASS!\n");
                 else
                     printf("md5 verification FAIL!\n");

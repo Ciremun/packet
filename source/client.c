@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    size_t packet_array_size = 600;
+    size_t packet_array_size = 1024;
     Packet *packet = (Packet *)malloc(PKT_SIZE(packet_array_size));
     packet->id = 1;
     packet->state = PKT_CREATED;
@@ -29,28 +29,19 @@ int main(int argc, char **argv)
     clock_gettime(CLOCK_REALTIME, &date);
     packet->date = date;
 
-    printf("ctime: %s\n", ctime(&date.tv_sec));
+    printf("ctime: %s.%ld\n", strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec);
 
     srand(time(NULL));
     packet->array.size = packet_array_size;
-    // printf("{ ");
-    // for (int16_t i = 0; i < packet->array.size; ++i)
-    // {
-    //     packet->array.data[i] = rand();
-    //     printf("%d, ", packet->array.data[i]);
-    // }
-    // printf("} \n");
+
+    for (size_t i = 0; i < packet->array.size; ++i)
+        packet->array.data[i] = rand();
 
     MD5Context ctx;
 	md5Init(&ctx);
 	md5Update(&ctx, (uint8_t *)packet->array.data, packet->array.size);
 	md5Finalize(&ctx);
     memcpy(packet->hash, ctx.digest, 16);
-
-    for(unsigned int i = 0; i < 16; ++i){
-		printf("%02x", packet->hash[i]);
-	}
-	printf("\n");
 
     int packet_size = PKT_SIZE(packet->array.size);
     printf("packet_size: %d\n", packet_size);
