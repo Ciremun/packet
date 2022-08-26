@@ -9,5 +9,6 @@
 #include "packet.h"
 #include "clock.h"
 #include "md5.h"
+#include "sleep.h"
 
 #endif // _CLIENT_H_

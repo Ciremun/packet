@@ -37,36 +37,39 @@ int main(void)
     while (1)
     {
         connfd = accept(listenfd, (struct sockaddr*)NULL, NULL);
-        if ((bytes_read = recv(connfd, (char *)&packet_info, PKT_INFO_SIZE, MSG_WAITALL)) > 0)
+        for (int i = 0; i < 2000; ++i)
         {
-            if (bytes_read != PKT_INFO_SIZE)
-                goto error;
-            if (!(600 <= packet_info.array.size && packet_info.array.size <= 1600))
+            if ((bytes_read = recv(connfd, (char *)&packet_info, PKT_INFO_SIZE, MSG_WAITALL)) > 0)
             {
-                SOCK_ERROR(PKT_SIZE_ERROR);
-                goto error;
-            }
-            Packet *packet = (Packet *)malloc(PKT_SIZE(packet_info.array.size));
-            memcpy(packet, &packet_info, PKT_INFO_SIZE);
-            if ((bytes_read = recv(connfd, (char *)&packet->array.data, packet->array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
-            {
-                if (bytes_read != packet->array.size * sizeof(int16_t))
+                if (bytes_read != PKT_INFO_SIZE)
                     goto error;
-                // printf("packet: %zu, %s.%ld, %d\n", packet->id, strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec, packet->state);
-                lock_mutex(packet_proc.mutex);
-                ring_write(&ring, packet);
-                unlock_mutex(packet_proc.mutex);
+                if (!(600 <= packet_info.array.size && packet_info.array.size <= 1600))
+                {
+                    SOCK_ERROR(PKT_SIZE_ERROR);
+                    goto error;
+                }
+                Packet *packet = (Packet *)malloc(PKT_SIZE(packet_info.array.size));
+                memcpy(packet, &packet_info, PKT_INFO_SIZE);
+                if ((bytes_read = recv(connfd, (char *)&packet->array.data, packet->array.size * sizeof(int16_t), MSG_WAITALL)) > 0)
+                {
+                    if (bytes_read != packet->array.size * sizeof(int16_t))
+                        goto error;
+                    // printf("packet: %zu, %s.%ld, %d\n", packet->id, strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec, packet->state);
+                    lock_mutex(packet_proc.mutex);
+                    ring_write(&ring, packet);
+                    unlock_mutex(packet_proc.mutex);
+                }
+                else if (bytes_read < 0)
+                {
+                    SOCK_ERROR(PKT_RECV_ERROR);
+                    goto error;
+                }
             }
             else if (bytes_read < 0)
             {
                 SOCK_ERROR(PKT_RECV_ERROR);
                 goto error;
             }
-        }
-        else if (bytes_read < 0)
-        {
-            SOCK_ERROR(PKT_RECV_ERROR);
-            goto error;
         }
 error:
         close(connfd);

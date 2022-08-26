@@ -28,7 +28,8 @@ void *process_incoming_packets(void *packet_proc)
                     printf("md5 verification PASS!\n");
                 else
                     printf("md5 verification FAIL!\n");
-                packet->state = PKT_PROCESSED;
+                packets_ring->data[i] = 0;
+                free(packet);
             }
         }
         unlock_mutex(packets_mutex);
