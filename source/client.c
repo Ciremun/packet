@@ -43,9 +43,6 @@ int main(int argc, char **argv)
 	md5Finalize(&ctx);
     memcpy(packet->hash, ctx.digest, 16);
 
-    int packet_size = PKT_SIZE(packet->array.size);
-    printf("packet_size: %d\n", packet_size);
-
     if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
         SOCK_ERROR(PKT_SOCK_ERROR);
@@ -69,12 +66,12 @@ int main(int argc, char **argv)
         return 1;
     }
 
+    int packet_size = PKT_SIZE(packet->array.size);
     int bytes_sent = send(sockfd, (const char *)packet, packet_size, 0);
-    if (bytes_sent < 0)
+    if (bytes_sent != packet_size)
     {
         SOCK_ERROR(PKT_SEND_ERROR);
     }
-    printf("bytes_sent: %d\n", bytes_sent);
 
     close(sockfd);
     return 0;
