@@ -1,10 +1,16 @@
 #include "client.h"
 
+static int random_int(int min, int max)
+{
+    return (rand() % (max + 1 - min)) + min;
+}
+
 static void send_thousand_packets(int sockfd)
 {
+    srand(time(NULL));
     for (int i = 0; i < 1000; ++i)
     {
-        size_t packet_array_size = 1024;
+        size_t packet_array_size = random_int(600, 1600);
         Packet *packet = (Packet *)malloc(PKT_SIZE(packet_array_size));
         packet->id = 1;
         packet->state = PKT_CREATED;
@@ -15,7 +21,6 @@ static void send_thousand_packets(int sockfd)
 
         printf("ctime: %s.%ld\n", strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec);
 
-        srand(time(NULL));
         packet->array.size = packet_array_size;
 
         for (size_t i = 0; i < packet->array.size; ++i)
