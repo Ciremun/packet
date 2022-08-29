@@ -20,9 +20,7 @@ void *process_incoming_packets(void *packet_proc)
         for (size_t i = 0; i < packets_ring->size; ++i)
         {
             Packet *packet = (Packet *)packets_ring->data[i];
-            if (packet == 0)
-                continue;
-            if (packet->state == PKT_CREATED)
+            if (packet && packet->state == PKT_CREATED)
             {
                 printf("Processed: %zu %s.%ld %s\n", packet->id,
                             strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec,
