@@ -3,9 +3,9 @@
 int verify_packet_md5(PacketData *array, uint8_t *hash)
 {
     MD5Context ctx;
-	md5Init(&ctx);
-	md5Update(&ctx, (uint8_t *)array->data, array->size);
-	md5Finalize(&ctx);
+    md5Init(&ctx);
+    md5Update(&ctx, (uint8_t *)array->data, array->size);
+    md5Finalize(&ctx);
     return memcmp(ctx.digest, hash, 16) == 0;
 }
 
@@ -24,16 +24,15 @@ void *process_incoming_packets(void *packet_proc)
                 continue;
             if (packet->state == PKT_CREATED)
             {
-                if (verify_packet_md5(&packet->array, packet->hash))
-                    printf("md5 verification PASS!\n");
-                else
-                    printf("md5 verification FAIL!\n");
+                printf("Processed: %zu %s.%ld %s\n", packet->id,
+                            strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec,
+                            verify_packet_md5(&packet->array, packet->hash) ? "PASS" : "FAIL");
                 packets_ring->data[i] = 0;
                 free(packet);
             }
+            sleep_ms(15);
         }
         unlock_mutex(packets_mutex);
-        sleep_ms(15);
     }
     return 0;
 }

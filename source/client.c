@@ -7,19 +7,18 @@ static int random_int(int min, int max)
 
 static void send_thousand_packets(int sockfd)
 {
+    static int packets_sent = 0;
     srand(time(NULL));
     for (int i = 0; i < 1000; ++i)
     {
         size_t packet_array_size = random_int(600, 1600);
         Packet *packet = (Packet *)malloc(PKT_SIZE(packet_array_size));
-        packet->id = 1;
+        packet->id = packets_sent;
         packet->state = PKT_CREATED;
 
         struct timespec date;
         clock_gettime(CLOCK_REALTIME, &date);
         packet->date = date;
-
-        printf("ctime: %s.%ld\n", strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec);
 
         packet->array.size = packet_array_size;
 
@@ -38,9 +37,13 @@ static void send_thousand_packets(int sockfd)
         {
             SOCK_ERROR(PKT_SEND_ERROR);
         }
+        else
+        {
+            printf("Sent: %d %s.%ld\n", packets_sent, strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec);
+            packets_sent++;
+        }
 
         free(packet);
-
         sleep_ms(10);
     }
 }

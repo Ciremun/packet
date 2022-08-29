@@ -54,7 +54,9 @@ int main(void)
                 {
                     if (bytes_read != packet->array.size * sizeof(int16_t))
                         goto error;
-                    // printf("packet: %zu, %s.%ld, %d\n", packet->id, strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec, packet->state);
+                    printf("Received: %zu %s.%ld %s\n", packet->id,
+                            strtok(ctime(&packet->date.tv_sec), "\n"), packet->date.tv_nsec,
+                            verify_packet_md5(&packet->array, packet->hash) ? "PASS" : "FAIL");
                     lock_mutex(packet_proc.mutex);
                     ring_write(&ring, packet);
                     unlock_mutex(packet_proc.mutex);
