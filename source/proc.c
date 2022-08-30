@@ -19,6 +19,7 @@ void *process_incoming_packets(void *packet_proc)
         lock_mutex(packets_mutex);
         for (size_t i = 0; i < packets_ring->size; ++i)
         {
+            sleep_ms(15);
             Packet *packet = (Packet *)packets_ring->data[i];
             if (packet && packet->state == PKT_CREATED)
             {
@@ -28,7 +29,6 @@ void *process_incoming_packets(void *packet_proc)
                 packets_ring->data[i] = 0;
                 free(packet);
             }
-            sleep_ms(15);
         }
         unlock_mutex(packets_mutex);
     }

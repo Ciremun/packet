@@ -75,7 +75,6 @@ int main(void)
         }
 error:
         close(connfd);
-        sleep_ms(10);
     }
 
     join_thread(packets_thread);
